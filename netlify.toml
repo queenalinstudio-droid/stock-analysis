@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Forward /api/data and /api/premarket to the serverless functions
+# so the same index.html works both locally (with server.py) and on Netlify.
+
+[[redirects]]
+  from = "/api/data"
+  to = "/.netlify/functions/data"
+  status = 200
+
+[[redirects]]
+  from = "/api/premarket"
+  to = "/.netlify/functions/premarket"
+  status = 200

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Tape &amp; The Tell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d0c0a; --paper:#f5f1e8; --paper-2:#ebe4d3;
+  --hairline:#d6cdb8; --bull:#a32020; --bear:#1f6b3a;
+  --warn:#b8741a; --neutral:#5a5751; --highlight:#fff7d1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:'Fraunces',Georgia,serif;min-height:100vh}
+body{background-image:radial-gradient(circle at 20% 10%,rgba(180,160,120,0.08) 0,transparent 40%),radial-gradient(circle at 80% 80%,rgba(120,100,80,0.06) 0,transparent 40%)}
+.frame{max-width:1480px;margin:0 auto;padding:32px 40px 80px}
+.masthead{border-bottom:3px double var(--ink);padding-bottom:18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--neutral)}
+.brand{font-family:'Fraunces',serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-0.02em;font-style:italic}
+.brand .amp{font-weight:400;color:var(--bull)}
+.tagline{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:var(--neutral);margin-top:4px}
+.dateline{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right;line-height:1.6}
+.dateline .big{font-size:14px;font-weight:700}
+.toolbar{display:flex;gap:12px;align-items:center;padding:14px 18px;margin-bottom:24px;background:var(--paper-2);border:1px solid var(--hairline)}
+.toolbar input{flex:1;background:var(--paper);border:1px solid var(--ink);padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:13px}
+.toolbar input:focus{outline:none;background:var(--highlight)}
+.btn{background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:11px 18px;border:none;cursor:pointer}
+.btn:hover{background:var(--bull)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper)}
+.status{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--neutral);min-width:220px}
+
+/* Portfolio summary bar */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--ink);margin-bottom:24px}
+.sm{padding:14px 18px;border-right:1px solid var(--hairline)}
+.sm:last-child{border-right:none}
+.sm-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--neutral);text-transform:uppercase}
+.sm-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-top:4px}
+.sm-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--neutral);margin-top:2px}
+
+.layout{display:grid;grid-template-columns:320px 1fr;gap:32px}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}}
+
+.watchlist h3{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--neutral);padding-bottom:8px;border-bottom:1px solid var(--ink);margin-bottom:8px}
+.wl-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 10px;cursor:pointer;border-left:3px solid transparent}
+.wl-item:hover{background:var(--paper-2)}
+.wl-item.active{background:var(--ink);color:var(--paper);border-left-color:var(--bull)}
+.wl-item.active .wl-sub,.wl-item.active .wl-pl-sub{color:var(--paper-2)}
+.wl-tk{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700}
+.wl-sub{font-family:'Fraunces',serif;font-size:11px;color:var(--neutral);font-style:italic}
+.wl-px{font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;font-weight:700}
+.wl-chg{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;text-align:right;margin-top:2px}
+.wl-pl-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--neutral);text-align:right;margin-top:2px}
+.up{color:var(--bull)} .down{color:var(--bear)}
+.wl-item.active .up{color:#ff8a8a}
+.wl-item.active .down{color:#9fe2b3}
+
+.dash-header{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding-bottom:18px;border-bottom:1px solid var(--ink);margin-bottom:24px}
+.dh-ticker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;color:var(--neutral)}
+.dh-name{font-family:'Fraunces',serif;font-weight:800;font-size:36px;line-height:1.05}
+.dh-regime{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--neutral);margin-top:6px}
+.dh-regime .v{color:var(--ink);font-weight:600;font-style:normal;background:var(--highlight);padding:1px 6px}
+.dh-px{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;line-height:1;text-align:right}
+.dh-chg{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:right;margin-top:6px}
+.dh-pl{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right;margin-top:6px;color:var(--neutral)}
+.dh-pl strong{color:var(--ink);font-size:13px}
+
+.grid-main{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-bottom:24px}
+@media(max-width:1100px){.grid-main{grid-template-columns:1fr}}
+.panel{background:var(--paper-2);border:1px solid var(--hairline);padding:22px 24px}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:16px}
+.panel-title{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:20px}
+.panel-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--neutral)}
+
+.ind-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+.ind-cell{padding:11px 4px;border-bottom:1px dotted var(--hairline)}
+.ind-cell:nth-child(odd){padding-right:16px;border-right:1px dotted var(--hairline)}
+.ind-cell:nth-child(even){padding-left:16px}
+.ind-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;color:var(--neutral);text-transform:uppercase}
+.ind-value{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;margin-top:2px}
+.ind-note{font-family:'Fraunces',serif;font-style:italic;font-size:12px;color:var(--neutral);margin-top:1px}
+
+.lvl-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px dotted var(--hairline)}
+.lvl-row:last-child{border-bottom:none}
+.lvl-label{font-family:'Fraunces',serif;font-size:14px}
+.lvl-label .tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.15em;padding:2px 6px;margin-right:8px;border:1px solid currentColor}
+.lvl-entry .tag{color:var(--bear)}
+.lvl-t1 .tag,.lvl-t2 .tag{color:var(--warn)}
+.lvl-exit .tag{color:var(--bull)}
+.lvl-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}
+.lvl-pct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--neutral);text-align:right}
+
+.action-row{display:grid;grid-template-columns:140px 140px 1fr;gap:20px;align-items:start;padding:18px 0;border-bottom:1px solid var(--hairline)}
+.action-row:last-child{border-bottom:none}
+.act-horizon{font-family:'Fraunces',serif;font-style:italic;font-size:15px;font-weight:600}
+.act-horizon .when{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.2em;color:var(--neutral);font-style:normal;font-weight:400;margin-top:2px}
+.act-pill{display:inline-block;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase}
+.pill-buy{background:var(--bear);color:var(--paper)}
+.pill-hold{background:var(--paper);color:var(--ink);border:1px solid var(--ink)}
+.pill-trim{background:var(--warn);color:var(--paper)}
+.pill-sell{background:var(--bull);color:var(--paper)}
+.pill-wait{background:var(--neutral);color:var(--paper)}
+.act-text{font-family:'Fraunces',serif;font-size:15px;line-height:1.55}
+
+.disclaimer{margin-top:32px;padding-top:18px;border-top:1px solid var(--hairline);font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--neutral);line-height:1.6}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--neutral);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{padding:60px 20px;text-align:center;font-family:'Fraunces',serif;font-style:italic;color:var(--neutral)}
+</style>
+</head>
+<body>
+<div class="frame">
+
+<div class="masthead">
+  <div>
+    <span class="eyebrow">Vol. I · A Private Technical Ledger</span>
+    <div class="brand">The Tape <span class="amp">&amp;</span> The Tell</div>
+    <span class="tagline">Live indicators, plain-language verdicts, no fortune-telling.</span>
+  </div>
+  <div class="dateline">
+    <div class="big" id="today-date">—</div>
+    <div id="market-clock">Market clock loading…</div>
+  </div>
+</div>
+
+<div class="summary" id="summary">
+  <div class="sm"><div class="sm-label">Cost Basis</div><div class="sm-value" id="sm-cost">—</div><div class="sm-sub">USD</div></div>
+  <div class="sm"><div class="sm-label">Market Value</div><div class="sm-value" id="sm-mv">—</div><div class="sm-sub" id="sm-mv-sub">—</div></div>
+  <div class="sm"><div class="sm-label">P/L Total</div><div class="sm-value" id="sm-pl">—</div><div class="sm-sub" id="sm-pl-sub">—</div></div>
+  <div class="sm"><div class="sm-label">Today</div><div class="sm-value" id="sm-today">—</div><div class="sm-sub" id="sm-today-sub">—</div></div>
+</div>
+
+<div class="toolbar">
+  <input id="ticker-input" placeholder="Add ticker — e.g. AAPL, GOOGL, AMZN" />
+  <button class="btn" onclick="addTicker()">Add</button>
+  <button class="btn ghost" onclick="refreshAll()">Refresh all</button>
+  <div class="status" id="status">Loading…</div>
+</div>
+
+<div class="layout">
+  <aside class="watchlist">
+    <h3>US Holdings · USD</h3>
+    <div id="wl"></div>
+  </aside>
+  <main>
+    <div id="dashboard"><div class="empty">Loading your portfolio…</div></div>
+  </main>
+</div>
+
+<div class="disclaimer">
+This dashboard reads daily price bars from Tiingo and computes standard technical indicators (RSI-14, MACD-12/26/9, SMA-20/50/200, Bollinger Bands 20/2, ATR-14) in the browser. Levels are derived from recent swing pivots, volatility, and moving averages — they are mechanical readings, not predictions. Treat verdicts as one data point, never as a substitute for your own judgment. Nothing here is investment advice. Colors follow Asian convention: red = up, green = down.
+</div>
+
+</div>
+
+<script>
+// ===== Portfolio: US holdings with cost basis =====
+// Verify these against your actual broker statements!
+const portfolio = [
+  {sym:"MRVL", name:"Marvell Technology",        shares:135, avgCost:149.255},
+  {sym:"TSLA", name:"Tesla",                     shares:123, avgCost:363.855},
+  {sym:"AAOI", name:"Applied Optoelectronics",   shares:94,  avgCost:148.686},
+  {sym:"NVDA", name:"NVIDIA",                    shares:61,  avgCost:203.867},
+  {sym:"MU",   name:"Micron Technology",         shares:6,   avgCost:655.005},
+  {sym:"INTC", name:"Intel",                     shares:27,  avgCost:108.297},
+  {sym:"NOW",  name:"ServiceNow",                shares:8,   avgCost:94.845},
+  {sym:"ADBE", name:"Adobe",                     shares:3,   avgCost:244.523},
+];
+
+const cache = {};  // sym -> {bars, computed, premarket, error}
+let activeSym = null;
+
+// ===== Tiingo data fetch =====
+async function fetchData(sym){
+  // Get 1 year of daily bars
+  const startDate = new Date(Date.now() - 400*24*3600*1000).toISOString().slice(0,10);
+  const r = await fetch(`/api/data?ticker=${encodeURIComponent(sym)}&startDate=${startDate}`);
+  if(!r.ok){
+    let msg = `HTTP ${r.status}`;
+    try{ const e = await r.json(); if(e.error||e.detail) msg = e.error||e.detail; }catch{}
+    throw new Error(msg);
+  }
+  const arr = await r.json();
+  if(!Array.isArray(arr)) throw new Error("Bad response from Tiingo");
+  // Tiingo returns: [{date, open, high, low, close, volume, ...}, ...] oldest-first
+  const bars = arr.map(d => ({
+    t: new Date(d.date).getTime(),
+    o: d.open, h: d.high, l: d.low, c: d.close, v: d.volume,
+  })).filter(b => b.c!=null);
+  return bars;
+}
+
+async function fetchPremarket(sym){
+  try{
+    const r = await fetch(`/api/premarket?ticker=${encodeURIComponent(sym)}`);
+    if(!r.ok) return null;
+    const arr = await r.json();
+    if(!Array.isArray(arr) || arr.length===0) return null;
+    const q = arr[0];
+    return {
+      last: q.last ?? q.tngoLast,
+      prevClose: q.prevClose,
+      open: q.open, high: q.high, low: q.low, volume: q.volume,
+      timestamp: q.timestamp,
+    };
+  }catch{ return null; }
+}
+
+// ===== Indicators (same math as before, Tiingo data shape) =====
+function sma(arr,n){const o=Array(arr.length).fill(null);let s=0;for(let i=0;i<arr.length;i++){s+=arr[i];if(i>=n)s-=arr[i-n];if(i>=n-1)o[i]=s/n;}return o}
+function ema(arr,n){const o=Array(arr.length).fill(null);const k=2/(n+1);let p=null;for(let i=0;i<arr.length;i++){if(arr[i]==null)continue;if(p==null){if(i>=n-1){let s=0;for(let j=i-n+1;j<=i;j++)s+=arr[j];p=s/n;o[i]=p}}else{p=arr[i]*k+p*(1-k);o[i]=p}}return o}
+function rsi(c,n=14){const o=Array(c.length).fill(null);if(c.length<n+1)return o;let g=0,l=0;for(let i=1;i<=n;i++){const d=c[i]-c[i-1];if(d>=0)g+=d;else l-=d}g/=n;l/=n;o[n]=100-100/(1+(l===0?100:g/l));for(let i=n+1;i<c.length;i++){const d=c[i]-c[i-1];g=(g*(n-1)+(d>0?d:0))/n;l=(l*(n-1)+(d<0?-d:0))/n;o[i]=100-100/(1+(l===0?100:g/l))}return o}
+function macd(c,f=12,s=26,sig=9){const ef=ema(c,f),es=ema(c,s);const line=c.map((_,i)=>(ef[i]!=null&&es[i]!=null)?ef[i]-es[i]:null);const signal=ema(line.map(x=>x==null?0:x),sig).map((v,i)=>line[i]==null?null:v);const hist=line.map((v,i)=>(v!=null&&signal[i]!=null)?v-signal[i]:null);return{line,signal,hist}}
+function bb(c,n=20,k=2){const m=sma(c,n);const u=Array(c.length).fill(null),lo=Array(c.length).fill(null);for(let i=n-1;i<c.length;i++){let s=0;for(let j=i-n+1;j<=i;j++)s+=(c[j]-m[i])**2;const sd=Math.sqrt(s/n);u[i]=m[i]+k*sd;lo[i]=m[i]-k*sd}return{mid:m,upper:u,lower:lo}}
+function atr(bars,n=14){const o=Array(bars.length).fill(null);const trs=bars.map((b,i)=>i===0?b.h-b.l:Math.max(b.h-b.l,Math.abs(b.h-bars[i-1].c),Math.abs(b.l-bars[i-1].c)));let s=0;for(let i=0;i<bars.length;i++){if(i<n){s+=trs[i];if(i===n-1)o[i]=s/n}else o[i]=(o[i-1]*(n-1)+trs[i])/n}return o}
+function swings(bars,lb=60,w=5){const start=Math.max(0,bars.length-lb);const hi=[],lo=[];for(let i=start+w;i<bars.length-w;i++){let isH=true,isL=true;for(let j=1;j<=w;j++){if(bars[i].h<=bars[i-j].h||bars[i].h<=bars[i+j].h)isH=false;if(bars[i].l>=bars[i-j].l||bars[i].l>=bars[i+j].l)isL=false}if(isH)hi.push(bars[i].h);if(isL)lo.push(bars[i].l)}return{highs:hi.sort((a,b)=>b-a),lows:lo.sort((a,b)=>a-b)}}
+
+function compute(bars){
+  if(bars.length<30) throw new Error("Not enough history");
+  const closes=bars.map(b=>b.c);
+  const vols=bars.map(b=>b.v||0);
+  const s20=sma(closes,20),s50=sma(closes,50),s200=sma(closes,200);
+  const r=rsi(closes,14), m=macd(closes), bbv=bb(closes,20,2), a=atr(bars,14), sw=swings(bars);
+  const i=closes.length-1;
+  let avgVol=0,n=0;for(let k=Math.max(0,i-19);k<=i;k++){avgVol+=vols[k]||0;n++}avgVol/=Math.max(n,1);
+  return {
+    last:closes[i], prev:closes[i-1],
+    sma20:s20[i], sma50:s50[i], sma200:s200[i],
+    rsi:r[i], macd:m.line[i], macdSig:m.signal[i], macdHist:m.hist[i], macdHistPrev:m.hist[i-1],
+    bbUpper:bbv.upper[i], bbMid:bbv.mid[i], bbLower:bbv.lower[i],
+    atr:a[i], vol:vols[i], avgVol, swings:sw,
+    yrHigh:Math.max(...bars.map(b=>b.h)), yrLow:Math.min(...bars.map(b=>b.l)),
+  };
+}
+
+// ===== Verdict engine =====
+function verdict(c){
+  const signals=[]; let score=0;
+  if(c.sma20&&c.sma50){
+    if(c.last>c.sma20&&c.sma20>c.sma50){score+=2;signals.push("price above rising 20/50-day MAs")}
+    else if(c.last<c.sma20&&c.sma20<c.sma50){score-=2;signals.push("price under falling 20/50-day MAs")}
+    else if(c.last>c.sma50){score+=1;signals.push("holding above the 50-day MA")}
+    else{score-=1;signals.push("price under the 50-day MA")}
+  }
+  if(c.sma200){
+    if(c.last>c.sma200){score+=1;signals.push("above the 200-day line")}
+    else{score-=1;signals.push("below the 200-day line")}
+  }
+  if(c.rsi!=null){
+    if(c.rsi>=70){score-=1;signals.push(`RSI ${c.rsi.toFixed(0)} — overbought`)}
+    else if(c.rsi>=55){score+=1;signals.push(`RSI ${c.rsi.toFixed(0)} — bullish`)}
+    else if(c.rsi<=30){score+=1;signals.push(`RSI ${c.rsi.toFixed(0)} — oversold`)}
+    else if(c.rsi<=45){score-=1;signals.push(`RSI ${c.rsi.toFixed(0)} — soft`)}
+    else signals.push(`RSI ${c.rsi.toFixed(0)} — neutral`);
+  }
+  if(c.macdHist!=null&&c.macdHistPrev!=null){
+    if(c.macdHist>0&&c.macdHist>c.macdHistPrev){score+=1;signals.push("MACD expanding bullish")}
+    else if(c.macdHist>0)signals.push("MACD positive, fading");
+    else if(c.macdHist<0&&c.macdHist<c.macdHistPrev){score-=1;signals.push("MACD deepening bearish")}
+    else signals.push("MACD negative, flattening");
+  }
+  if(c.vol&&c.avgVol){
+    const r=c.vol/c.avgVol;
+    if(r>1.5&&c.last>c.prev){score+=1;signals.push(`${r.toFixed(1)}× volume on up close`)}
+    else if(r>1.5&&c.last<c.prev){score-=1;signals.push(`${r.toFixed(1)}× volume on down close — distribution`)}
+  }
+  let regime, v;
+  if(score>=4){regime="Strong uptrend";v="Accumulate on weakness"}
+  else if(score>=2){regime="Constructive";v="Hold long, add on dips"}
+  else if(score>=0){regime="Mixed / range";v="Wait for setup"}
+  else if(score>=-2){regime="Weakening";v="Trim into strength"}
+  else{regime="Downtrend";v="Reduce or stand aside"}
+  return {score, signals, regime, verdictWord:v};
+}
+
+function levels(c){
+  const resA=c.swings.highs.filter(h=>h>c.last).sort((a,b)=>a-b);
+  const supB=c.swings.lows.filter(l=>l<c.last).sort((a,b)=>b-a);
+  let entry=null;
+  if(supB.length)entry=supB[0];
+  if(c.sma20&&c.sma20<c.last){if(entry==null||Math.abs(c.last-c.sma20)<Math.abs(c.last-entry)*1.2)entry=Math.max(entry||0,c.sma20)}
+  if(entry==null||(c.last-entry)/c.last>0.10)entry=c.bbMid||c.last*0.97;
+  let t1=resA[0]||(c.last+1.5*c.atr);
+  if(t1-c.last<0.5*c.atr)t1=c.last+1.5*c.atr;
+  let t2=resA[1]||c.yrHigh||(c.last+3*c.atr);
+  if(t2<=t1)t2=Math.max(t1*1.05,c.last+3*c.atr);
+  let exit=null;
+  if(supB.length)exit=supB[0]-0.5*c.atr;
+  if(c.sma50&&c.sma50<c.last&&(exit==null||c.sma50-0.3*c.atr>exit))exit=c.sma50-0.3*c.atr;
+  if(exit==null||(c.last-exit)/c.last>0.15)exit=c.last-2*c.atr;
+  return {entry,t1,t2,exit};
+}
+
+function actions(c,v,L){
+  const acts=[];
+  if(v.score>=2){
+    if(c.last<=L.entry*1.02) acts.push({h:"Right now",w:"Today",p:"pill-buy",t:"Add",x:`Price is in the buy zone near ${fmt(L.entry)}. Scale in tranches, stop below ${fmt(L.exit)}.`});
+    else if(c.rsi>=70) acts.push({h:"Right now",w:"Today",p:"pill-hold",t:"Hold",x:`Trend strong but RSI ${c.rsi.toFixed(0)} stretched. Wait for pullback to ${fmt(L.entry)}.`});
+    else acts.push({h:"Right now",w:"Today",p:"pill-hold",t:"Hold",x:`Constructive but between buy zone and T1. Hold; add only on a dip to ${fmt(L.entry)}.`});
+  } else if(v.score>=0){
+    acts.push({h:"Right now",w:"Today",p:"pill-wait",t:"Wait",x:`Mixed signals. Wait for a clean break above ${fmt(L.t1)} on volume, or a flush to ${fmt(L.entry)}.`});
+  } else if(v.score>=-2){
+    acts.push({h:"Right now",w:"Today",p:"pill-trim",t:"Trim",x:`Tape weakening. Trim into bounces, tighten stops. No adds until structure repairs.`});
+  } else {
+    acts.push({h:"Right now",w:"Today",p:"pill-sell",t:"Reduce",x:`Downtrend intact. Reduce exposure. Re-enter only after reclaiming the 50-day MA on volume.`});
+  }
+  if(v.score>=2) acts.push({h:"Short-term",w:"1–4 weeks",p:"pill-hold",t:"Ride trend",x:`Trail stop under rising 20-day MA. Take ⅓ at ${fmt(L.t1)}, let rest run to ${fmt(L.t2)}.`});
+  else if(v.score>=0) acts.push({h:"Short-term",w:"1–4 weeks",p:"pill-wait",t:"Patience",x:`Sit out. Don't pay tuition while the market decides direction.`});
+  else acts.push({h:"Short-term",w:"1–4 weeks",p:"pill-wait",t:"Stand aside",x:`Until price reclaims ${fmt(c.sma50||c.last*1.05)} and MACD turns up, this isn't your fight.`});
+  return acts;
+}
+
+// ===== Formatting =====
+function fmt(n){if(n==null||!isFinite(n))return"—";if(n>=1000)return n.toFixed(0);if(n>=100)return n.toFixed(1);return n.toFixed(2)}
+function fmtUsd(n){if(n==null)return"—";return "$"+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}
+function fmtPct(n){if(n==null)return"—";return (n>=0?'+':'')+n.toFixed(2)+'%'}
+
+function renderWatchlist(){
+  const el=document.getElementById('wl');
+  el.innerHTML = portfolio.map(s=>{
+    const d=cache[s.sym]; const c=d?.computed;
+    const px = c?.last ?? d?.premarket?.last;
+    const prev = c?.prev ?? d?.premarket?.prevClose;
+    const chg = (px&&prev) ? (px-prev)/prev*100 : null;
+    const mv = px ? px*s.shares : null;
+    const cost = s.shares*s.avgCost;
+    const plPct = mv ? (mv-cost)/cost*100 : null;
+    const stateMark = d?.error ? '<span style="color:var(--bull);font-size:9px">✕</span>' : (c?'':'<span class="spinner" style="width:8px;height:8px"></span>');
+    return `<div class="wl-item ${s.sym===activeSym?'active':''}" onclick="selectTicker('${s.sym}')">
+      <div>
+        <div class="wl-tk">${s.sym}</div>
+        <div class="wl-sub">${s.name}</div>
+      </div>
+      <div>
+        <div class="wl-px">${px!=null?fmt(px):stateMark}</div>
+        <div class="wl-chg ${chg==null?'':chg>=0?'up':'down'}">${chg==null?'':fmtPct(chg)}</div>
+        <div class="wl-pl-sub ${plPct==null?'':plPct>=0?'up':'down'}">${plPct==null?`${s.shares}sh`:`${s.shares}sh · ${fmtPct(plPct)}`}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSummary(){
+  let cost=0, mv=0, todayPL=0, prevMv=0;
+  let complete=true;
+  for(const s of portfolio){
+    cost += s.shares*s.avgCost;
+    const c=cache[s.sym]?.computed;
+    if(c?.last){
+      mv += c.last*s.shares;
+      prevMv += (c.prev||c.last)*s.shares;
+    } else {
+      complete = false;
+    }
+  }
+  todayPL = mv - prevMv;
+  const pl = mv - cost;
+  const plPct = cost ? pl/cost*100 : 0;
+  const todayPct = prevMv ? todayPL/prevMv*100 : 0;
+
+  document.getElementById('sm-cost').textContent = fmtUsd(cost);
+  document.getElementById('sm-mv').textContent = mv ? fmtUsd(mv) : "—";
+  document.getElementById('sm-mv-sub').textContent = complete ? "USD" : "(loading…)";
+  const plEl = document.getElementById('sm-pl');
+  plEl.textContent = mv ? (pl>=0?"+":"") + fmtUsd(pl) : "—";
+  plEl.className = "sm-value " + (pl>=0?"up":"down");
+  document.getElementById('sm-pl-sub').textContent = mv ? fmtPct(plPct) : "—";
+  const todayEl = document.getElementById('sm-today');
+  todayEl.textContent = mv ? (todayPL>=0?"+":"") + fmtUsd(todayPL) : "—";
+  todayEl.className = "sm-value " + (todayPL>=0?"up":"down");
+  document.getElementById('sm-today-sub').textContent = mv ? fmtPct(todayPct) : "—";
+}
+
+function renderDashboard(sym){
+  const d = cache[sym];
+  const out = document.getElementById('dashboard');
+  if(!d){ out.innerHTML = `<div class="empty"><span class="spinner"></span>Loading ${sym}…</div>`; return; }
+  if(d.error){ out.innerHTML = `<div class="empty">Could not load <strong>${sym}</strong>: ${d.error}</div>`; return; }
+  const c = d.computed, v = verdict(c), L = levels(c), A = actions(c,v,L);
+  const meta = portfolio.find(x=>x.sym===sym) || {name:sym, shares:0, avgCost:0};
+  const chgPct = (c.last-c.prev)/c.prev*100;
+  const cost = meta.shares*meta.avgCost;
+  const mv = c.last*meta.shares;
+  const pl = mv-cost;
+  const plPct = cost ? pl/cost*100 : 0;
+
+  out.innerHTML = `
+    <div class="dash-header">
+      <div>
+        <div class="dh-ticker">${sym} · NYSE/NASDAQ · USD</div>
+        <div class="dh-name">${meta.name}</div>
+        <div class="dh-regime">Regime: <span class="v">${v.regime}</span>  ·  Verdict: <span class="v">${v.verdictWord}</span></div>
+      </div>
+      <div>
+        <div class="dh-px">${fmt(c.last)}</div>
+        <div class="dh-chg ${chgPct>=0?'up':'down'}">${fmtPct(chgPct)} · ${chgPct>=0?'+':''}${(c.last-c.prev).toFixed(2)}</div>
+        ${meta.shares?`<div class="dh-pl">${meta.shares}sh @ $${meta.avgCost.toFixed(2)} · <strong class="${pl>=0?'up':'down'}">${pl>=0?'+':''}${fmtUsd(pl)} (${fmtPct(plPct)})</strong></div>`:''}
+      </div>
+    </div>
+
+    <div class="grid-main">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">What the tape says</div><div class="panel-num">№ 01 · INDICATORS</div></div>
+        <div class="ind-grid">
+          <div class="ind-cell"><div class="ind-label">RSI · 14</div><div class="ind-value">${c.rsi?c.rsi.toFixed(1):'—'}</div><div class="ind-note">${rsiNote(c.rsi)}</div></div>
+          <div class="ind-cell"><div class="ind-label">MACD Hist</div><div class="ind-value ${c.macdHist>0?'up':'down'}">${c.macdHist!=null?(c.macdHist>=0?'+':'')+c.macdHist.toFixed(2):'—'}</div><div class="ind-note">${macdNote(c.macdHist,c.macdHistPrev)}</div></div>
+          <div class="ind-cell"><div class="ind-label">20-day MA</div><div class="ind-value">${fmt(c.sma20)}</div><div class="ind-note">${maNote(c.last,c.sma20)}</div></div>
+          <div class="ind-cell"><div class="ind-label">50-day MA</div><div class="ind-value">${fmt(c.sma50)}</div><div class="ind-note">${maNote(c.last,c.sma50)}</div></div>
+          <div class="ind-cell"><div class="ind-label">200-day MA</div><div class="ind-value">${fmt(c.sma200)}</div><div class="ind-note">${maNote(c.last,c.sma200)}</div></div>
+          <div class="ind-cell"><div class="ind-label">ATR · 14</div><div class="ind-value">${fmt(c.atr)}</div><div class="ind-note">~${(c.atr/c.last*100).toFixed(1)}% daily range</div></div>
+          <div class="ind-cell"><div class="ind-label">Bollinger pos</div><div class="ind-value">${bbPos(c)}</div><div class="ind-note">${fmt(c.bbLower)} – ${fmt(c.bbUpper)}</div></div>
+          <div class="ind-cell"><div class="ind-label">Vol vs 20d</div><div class="ind-value">${c.avgVol?(c.vol/c.avgVol).toFixed(1)+'×':'—'}</div><div class="ind-note">${c.avgVol?volNote(c.vol/c.avgVol,c.last>c.prev):''}</div></div>
+        </div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--hairline);font-family:'Fraunces',serif;font-size:14px;line-height:1.55">
+          <em>Reading:</em> ${v.signals.join(' · ')}.
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Levels worth caring about</div><div class="panel-num">№ 02 · LEVELS</div></div>
+        <div class="lvl-row lvl-entry">
+          <div class="lvl-label"><span class="tag">BUY ZONE</span>Where to add</div>
+          <div><div class="lvl-value">${fmt(L.entry)}</div><div class="lvl-pct">${((L.entry-c.last)/c.last*100).toFixed(1)}% from spot</div></div>
+        </div>
+        <div class="lvl-row lvl-t1">
+          <div class="lvl-label"><span class="tag">TARGET 1</span>Conservative</div>
+          <div><div class="lvl-value">${fmt(L.t1)}</div><div class="lvl-pct">+${((L.t1-c.last)/c.last*100).toFixed(1)}% upside</div></div>
+        </div>
+        <div class="lvl-row lvl-t2">
+          <div class="lvl-label"><span class="tag">TARGET 2</span>Aggressive</div>
+          <div><div class="lvl-value">${fmt(L.t2)}</div><div class="lvl-pct">+${((L.t2-c.last)/c.last*100).toFixed(1)}% upside</div></div>
+        </div>
+        <div class="lvl-row lvl-exit">
+          <div class="lvl-label"><span class="tag">EXIT</span>Stop / invalidation</div>
+          <div><div class="lvl-value">${fmt(L.exit)}</div><div class="lvl-pct">${((L.exit-c.last)/c.last*100).toFixed(1)}% risk</div></div>
+        </div>
+        <div style="margin-top:14px;font-family:'Fraunces',serif;font-style:italic;font-size:12px;color:var(--neutral);line-height:1.5">
+          Reward/risk to T1: <strong style="color:var(--ink)">${rr(c.last,L.t1,L.exit)}</strong> · to T2: <strong style="color:var(--ink)">${rr(c.last,L.t2,L.exit)}</strong>. Under 1.5× is a thin setup.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">What to actually do</div><div class="panel-num">№ 03 · ORDERS</div></div>
+      ${A.map(a=>`<div class="action-row">
+        <div class="act-horizon">${a.h}<span class="when">${a.w}</span></div>
+        <div><span class="act-pill ${a.p}">${a.t}</span></div>
+        <div class="act-text">${a.x}</div>
+      </div>`).join('')}
+    </div>
+  `;
+}
+
+function rsiNote(r){if(r==null)return'—';if(r>=70)return'overbought';if(r>=55)return'bullish';if(r>=45)return'neutral';if(r>=30)return'soft';return'oversold'}
+function macdNote(h,p){if(h==null)return'—';if(h>0&&h>p)return'positive & expanding';if(h>0)return'positive but fading';if(h<0&&h<p)return'negative & deepening';return'negative but flattening'}
+function maNote(px,ma){if(!ma)return'—';const d=(px-ma)/ma*100;return d>0?`+${d.toFixed(1)}% above`:`${d.toFixed(1)}% below`}
+function bbPos(c){if(!c.bbUpper||!c.bbLower)return'—';return ((c.last-c.bbLower)/(c.bbUpper-c.bbLower)*100).toFixed(0)+'%'}
+function volNote(r,up){if(r>1.5)return up?'heavy buying':'heavy selling';if(r<0.6)return'quiet';return'normal'}
+function rr(spot,target,stop){const reward=target-spot,risk=spot-stop;if(risk<=0)return'—';return (reward/risk).toFixed(2)+'×'}
+
+// ===== Controllers =====
+async function loadTicker(sym){
+  try{
+    document.getElementById('status').innerHTML = `<span class="spinner"></span>Fetching ${sym}…`;
+    const bars = await fetchData(sym);
+    const computed = compute(bars);
+    cache[sym] = {bars, computed};
+    document.getElementById('status').textContent = `Loaded ${sym}`;
+  }catch(e){
+    cache[sym] = {error: e.message};
+    document.getElementById('status').textContent = `Failed ${sym}: ${e.message}`;
+  }
+}
+
+async function selectTicker(sym){
+  activeSym = sym;
+  renderWatchlist();
+  if(!cache[sym] || (!cache[sym].computed && !cache[sym].error)){
+    document.getElementById('dashboard').innerHTML = `<div class="empty"><span class="spinner"></span>Loading ${sym}…</div>`;
+    await loadTicker(sym);
+  }
+  renderDashboard(sym);
+}
+
+function addTicker(){
+  const inp = document.getElementById('ticker-input');
+  const sym = inp.value.trim().toUpperCase();
+  if(!sym) return;
+  if(!portfolio.some(x=>x.sym===sym)) portfolio.push({sym, name:sym, shares:0, avgCost:0});
+  inp.value='';
+  selectTicker(sym);
+}
+
+async function refreshAll(){
+  for(const k of Object.keys(cache)) delete cache[k];
+  renderWatchlist();
+  const total = portfolio.length;
+  for(let i=0;i<total;i++){
+    await loadTicker(portfolio[i].sym);
+    renderWatchlist();
+    renderSummary();
+  }
+  if(activeSym) renderDashboard(activeSym);
+  const ok = Object.values(cache).filter(c=>c.computed).length;
+  document.getElementById('status').textContent = `Refreshed · ${ok}/${total}`;
+}
+
+async function init(){
+  const today = new Date();
+  document.getElementById('today-date').textContent = today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  setInterval(()=>{
+    const d = new Date();
+    document.getElementById('market-clock').textContent =
+      'Taipei ' + d.toLocaleTimeString('en-US',{hour12:false,timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit'}) +
+      ' · NY ' + d.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/New_York',hour:'2-digit',minute:'2-digit'});
+  },1000);
+  document.getElementById('ticker-input').addEventListener('keypress',e=>{if(e.key==='Enter')addTicker()});
+
+  renderWatchlist();
+  renderSummary();
+  document.getElementById('status').textContent = `Loading ${portfolio.length} tickers…`;
+  // Load sequentially to be polite to Tiingo's free tier
+  for(const s of portfolio){
+    await loadTicker(s.sym);
+    renderWatchlist();
+    renderSummary();
+  }
+  const ok = Object.values(cache).filter(c=>c.computed).length;
+  document.getElementById('status').textContent = `Ready · ${ok}/${portfolio.length} loaded`;
+  const first = portfolio.find(s=>cache[s.sym]?.computed);
+  if(first) selectTicker(first.sym);
+  else document.getElementById('dashboard').innerHTML = `<div class="empty">No tickers loaded. Check the Network tab for errors.</div>`;
+}
+init();
+</script>
+</body>
+</html>
